@@ -42,10 +42,6 @@
 //! trees.
 
 //#[unstable]
-#![feature(box_syntax)]
-#![feature(collections)]
-#![feature(core)]
-#![feature(convert)]
 
 pub use quadtree::Quadtree;
 pub use octree::Octree;

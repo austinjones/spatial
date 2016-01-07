@@ -110,7 +110,7 @@ impl<T: SpatialKey, I: Index<T> + Clone> Octree<T, I> {
         match self.octants {
             Some(ref octants) => {
                 for ref node in octants.iter() {
-                    items.push_all(node.get_in_volume(vol).as_slice());
+                    items.extend_from_slice(&node.get_in_volume(vol)[..]);
                 }
                 items
             },
@@ -130,7 +130,7 @@ impl<T: SpatialKey, I: Index<T> + Clone> Octree<T, I> {
         
         let val2 : T = NumCast::from(2).unwrap();
        
-        for item in in_box.drain() {
+        for item in in_box.drain(..) {
         	let index = item.octree_index();
         	let d0 = (index[0] - center[0]).powf(val2);
         	let d1 = (index[1] - center[1]).powf(val2);
@@ -158,15 +158,15 @@ impl<T: SpatialKey, I: Index<T> + Clone> Octree<T, I> {
         
         self.octants = Some([
             // upper
-            box Octree::with_capacity(Volume::new([min[0], min[1], min[2]], [hw, hh, hd]), cap),
-            box Octree::with_capacity(Volume::new([min[0] + hh, min[1], min[2]], [max[0], hh, hd]), cap),
-            box Octree::with_capacity(Volume::new([min[0], min[1] + hh, min[2]], [hw, max[1], hd]), cap),
-            box Octree::with_capacity(Volume::new([min[0] + hw, min[1] + hh, min[2]], [max[0], max[1], hd]), cap),
+            Box::new(Octree::with_capacity(Volume::new([min[0], min[1], min[2]], [hw, hh, hd]), cap)),
+            Box::new(Octree::with_capacity(Volume::new([min[0] + hh, min[1], min[2]], [max[0], hh, hd]), cap)),
+            Box::new(Octree::with_capacity(Volume::new([min[0], min[1] + hh, min[2]], [hw, max[1], hd]), cap)),
+            Box::new(Octree::with_capacity(Volume::new([min[0] + hw, min[1] + hh, min[2]], [max[0], max[1], hd]), cap)),
             // lower
-            box Octree::with_capacity(Volume::new([min[0], min[1], hd], [hw, hh, max[2]]), cap),
-            box Octree::with_capacity(Volume::new([min[0] + hh, min[1], hd], [max[0], hh, max[2]]), cap),
-            box Octree::with_capacity(Volume::new([min[0], min[1] + hh, hd], [hw, max[1], max[2]]), cap),
-            box Octree::with_capacity(Volume::new([min[0] + hw, min[1] + hh, hd], [max[0], max[1], max[2]]), cap)
+            Box::new(Octree::with_capacity(Volume::new([min[0], min[1], hd], [hw, hh, max[2]]), cap)),
+            Box::new(Octree::with_capacity(Volume::new([min[0] + hh, min[1], hd], [max[0], hh, max[2]]), cap)),
+            Box::new(Octree::with_capacity(Volume::new([min[0], min[1] + hh, hd], [hw, max[1], max[2]]), cap)),
+            Box::new(Octree::with_capacity(Volume::new([min[0] + hw, min[1] + hh, hd], [max[0], max[1], max[2]]), cap))
                 ]);
     }
 }

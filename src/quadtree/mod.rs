@@ -110,7 +110,7 @@ impl<T: SpatialKey, P: Index<T> + Clone> Quadtree<T, P> {
         match self.quadrants {
             Some(ref quadrants) => {
                 for ref node in quadrants.iter() {
-                    items.push_all(node.get_in_volume(vol).as_slice());
+                    items.extend_from_slice(&node.get_in_volume(vol)[..]);
                 }
                 items
             },
@@ -133,7 +133,7 @@ impl<T: SpatialKey, P: Index<T> + Clone> Quadtree<T, P> {
         
         let val2 : T = NumCast::from(2).unwrap();
         
-        for item in in_box.drain() {
+        for item in in_box.drain(..) {
         	let index = item.quadtree_index();
         	let d0 = (index[0] - center[0]).powf(val2);
         	let d1 = (index[1] - center[1]).powf(val2);
@@ -163,10 +163,10 @@ impl<T: SpatialKey, P: Index<T> + Clone> Quadtree<T, P> {
         let (hw, hh) = (max[0].div(val2), max[1].div(val2));
         
         self.quadrants = Some([
-            box Quadtree::with_capacity(Volume::new([min[0], min[1]], [hw, hh]), self.capacity),
-            box Quadtree::with_capacity(Volume::new([min[0] + hh, min[1]], [max[0], hh]), self.capacity),
-            box Quadtree::with_capacity(Volume::new([min[0], min[1] + hh], [hw, max[1]]), self.capacity),
-            box Quadtree::with_capacity(Volume::new([min[0] + hw, min[1] + hh], [max[0], max[1]]), self.capacity)
+            Box::new(Quadtree::with_capacity(Volume::new([min[0], min[1]], [hw, hh]), self.capacity)),
+            Box::new(Quadtree::with_capacity(Volume::new([min[0] + hh, min[1]], [max[0], hh]), self.capacity)),
+            Box::new(Quadtree::with_capacity(Volume::new([min[0], min[1] + hh], [hw, max[1]]), self.capacity)),
+            Box::new(Quadtree::with_capacity(Volume::new([min[0] + hw, min[1] + hh], [max[0], max[1]]), self.capacity))
                 ]);
     }
 }
